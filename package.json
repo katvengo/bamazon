@@ -1,0 +1,23 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Homework assignment using Node.js and MySQL as well as inquirer",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katvengo/bamazon.git"
+  },
+  "author": "Kat Vengoechea",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/katvengo/bamazon/issues"
+  },
+  "homepage": "https://github.com/katvengo/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.3.1",
+    "mysql": "^2.17.1"
+  }
+}
