@@ -19,7 +19,7 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
     displayStartingValues()
-    connection.end()
+
 })
 
 function displayStartingValues() {
@@ -47,28 +47,70 @@ function run() {
 
         inquirer
             .prompt([{
-                name: "Items for Sale",
-                type: "rawlist",
-                mesage: "What would you like to buy?",
-                choices: function () {
-                    var choiceArray = []
-                    for (let i = 0; i < results.length; i++) {
-                        choiceArray.push(results[i].product_name);
-                    }
-                    return choiceArray
+                    name: "What would you like to Buy?",
+                    type: "rawlist",
+                    mesage: "What would you like to buy?",
+                    choices: function () {
+                        var choiceArray = []
+                        for (let i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].item_id);
+                        }
+                        return choiceArray;
+                    },
 
-                }
 
-            }])
+                },
+                {
+                    name: "amount",
+                    type: "input",
+                    message: "How many units would you like to buy?",
+                },
+            ])
             .then(function (answer) {
                 var chosenItem;
-
                 for (let i = 0; i < results.length; i++) {
                     if (results[i].product_name === answer.choice) {
                         chosenItem = results[i]
                     }
+                }
+                var found = results.find(function (results) {
+                    return results.stock_quantity
+                })
+                if (answer.amount > found.stock_quantity) {
+                    console.log("Insufficient amount left in stock.")
+                } else if (answer.amount <= found.stock_quantity) {
+                    var remainder = parseInt(found.stock_quantity) - parseInt(answer.amount)
+                    let sql =
+                        `UPDATE products 
+                    SET stock_quantity = ?
+                    WHERE stock_quantity =  ?`
+
+                    connection.query(sql,
+                        [
+                            remainder, found.stock_quantity
+                        ],
+
+                        (error, results) => {
+                            if (error) {
+                                return console.error(error.message);
+                            }
+
+                        });
 
                 }
+                var findPrice = results.find(function (results) {
+                    return results.price
+                })
+                console.log("Thank you for your purchase! The total cost of your purchase is:" + "" + findPrice.price * answer.amount)
+
+                // console.log(found.stock_quantity)
+
+                // console.log(answer.amount)
+
+                connection.end()
+
             })
+
+
     })
 }
