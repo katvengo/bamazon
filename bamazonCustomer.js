@@ -29,6 +29,7 @@ function displayStartingValues() {
         function (err, res) {
             if (err) throw err;
             console.log("Products for sale!")
+            console.log("What would you like to buy?")
             for (let i = 0; i < res.length; i++) {
                 console.log("Item id Number:" + " " + res[i].item_id + "   " + "Name:" + " " + res[i].product_name + "   " +
                     "Price:" + " " + "$" + res[i].price);
@@ -39,6 +40,7 @@ function displayStartingValues() {
 
     )
     run()
+   
 }
 
 function run() {
@@ -47,15 +49,17 @@ function run() {
 
         inquirer
             .prompt([{
-                    name: "What would you like to Buy?",
+                    name: "action",
                     type: "rawlist",
-                    mesage: "What would you like to buy?",
+                    // mesage: "What would you like to buy?",
                     choices: function () {
                         var choiceArray = []
                         for (let i = 0; i < results.length; i++) {
                             choiceArray.push(results[i].item_id);
                         }
                         return choiceArray;
+
+
                     },
 
 
@@ -67,27 +71,29 @@ function run() {
                 },
             ])
             .then(function (answer) {
-                var chosenItem;
+                var chosenItem = answer.action
+                // console.log(chosenItem)
+
                 for (let i = 0; i < results.length; i++) {
-                    if (results[i].product_name === answer.choice) {
+                    if (results[i].item_id === chosenItem) {
                         chosenItem = results[i]
                     }
+
                 }
-                var found = results.find(function (results) {
-                    return results.stock_quantity
-                })
-                if (answer.amount > found.stock_quantity) {
+                // console.log(chosenItem.stock_quantity)
+               
+                if (answer.amount > chosenItem.stock_quantity) {
                     console.log("Insufficient amount left in stock.")
-                } else if (answer.amount <= found.stock_quantity) {
-                    var remainder = parseInt(found.stock_quantity) - parseInt(answer.amount)
+                } else if (answer.amount <= chosenItem.stock_quantity) {
+                    var remainder = parseInt(chosenItem.stock_quantity) - parseInt(answer.amount)
                     let sql =
                         `UPDATE products 
-                    SET stock_quantity = ?
-                    WHERE stock_quantity =  ?`
+                                SET stock_quantity = ?
+                                 WHERE stock_quantity =  ?`
 
                     connection.query(sql,
                         [
-                            remainder, found.stock_quantity
+                            remainder, chosenItem.stock_quantity
                         ],
 
                         (error, results) => {
@@ -96,20 +102,14 @@ function run() {
                             }
 
                         });
+                    var findPrice = parseInt(chosenItem.price) * parseInt(answer.amount)
+                    console.log("Thank you for your purchase! The total cost of your purchase is:" + "" + findPrice)
 
+
+                    connection.end()
                 }
-                var findPrice = results.find(function (results) {
-                    return results.price
-                })
-                console.log("Thank you for your purchase! The total cost of your purchase is:" + "" + findPrice.price * answer.amount)
-
-                // console.log(found.stock_quantity)
-
-                // console.log(answer.amount)
-
-                connection.end()
-
             })
+
 
 
     })
