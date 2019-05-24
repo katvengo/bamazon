@@ -40,7 +40,7 @@ function displayStartingValues() {
 
     )
     run()
-   
+
 }
 
 function run() {
@@ -81,7 +81,7 @@ function run() {
 
                 }
                 // console.log(chosenItem.stock_quantity)
-               
+
                 if (answer.amount > chosenItem.stock_quantity) {
                     console.log("Insufficient amount left in stock.")
                 } else if (answer.amount <= chosenItem.stock_quantity) {
